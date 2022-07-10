@@ -1,0 +1,11 @@
+{
+	"title"		:	"GPoker - Poker in Garry's Mod",
+	"type"		:	"tool",
+	"tags"		:	[ "fun", "realism" ],
+	"ignore"	:
+	[
+		"*.psd",
+		"*.vcproj",
+		"*.svn*"
+	]
+}
