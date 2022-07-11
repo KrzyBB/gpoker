@@ -223,7 +223,7 @@ net.Receive("gpoker_derma_createGame", function()
     local bots = {}
 
     botAdd.DoClick = function()
-        if #botsList:GetLines() >= maxPly:GetValue() then return end
+        if #botsList:GetLines() >= math.Clamp(maxPly:GetValue(), maxPly:GetMin(), maxPly:GetMax()) then return end
 
         local index = #bots + 1
 

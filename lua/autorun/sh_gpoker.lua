@@ -211,7 +211,6 @@ gPoker.betType = {
                 p:addMoney(a)
             end
 
-
             e:SetPot(e:GetPot() - a)
         end,
         call = function(s, p) --Called after player joins, mostly used for setting up custom value
@@ -220,7 +219,6 @@ gPoker.betType = {
             elseif !p:IsPlayer() then
                 s.players[s:getPlayerKey(p)].money = math.random(100,1000)
             end
-            s:updatePlayersTable()
         end,
         models      = {  --The spinning model at the center
             [1] = {
@@ -271,7 +269,10 @@ gPoker.betType = {
                 e:removePlayerFromMatch(p)
                 if p:IsPlayer() then p:Kill() end
             else
-                if p:IsPlayer() then p:SetHealth(hp) else e.players[e:getPlayerKey(p)].health = hp end
+                if p:IsPlayer() then p:SetHealth(hp) else 
+                    e.players[e:getPlayerKey(p)].health = hp 
+                    e:updatePlayersTable() 
+                end
             end
 
             e:SetPot(e:GetPot() - a)
@@ -279,7 +280,6 @@ gPoker.betType = {
         call = function(s, p)
             if !p:IsPlayer() then
                 s.players[s:getPlayerKey(p)].health = 100 + math.random(0,150) --Add a little randomziation ;)
-                s:updatePlayersTable()
             end
         end,
         models      = {

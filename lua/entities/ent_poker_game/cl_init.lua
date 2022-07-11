@@ -38,7 +38,7 @@ function ENT:Draw()
 
     for k,v in pairs(self.players) do
         local ent = Entity(v.ind)
-        if self:GetPos():Distance(LocalPlayer():GetPos()) <= 256 and self:getPlayerKey(ent) then
+        if self:GetPos():Distance(LocalPlayer():GetPos()) <= 256 then
             local ang = EyeAngles()
             ang.p = 0
             ang.r = 0
@@ -162,7 +162,7 @@ function ENT:Initialize()
             
                 local text = "Press [" .. string.upper(input.LookupBinding("+use")) .. "] to join."
                 if !canJoin then text = "Cannot join - already in a match." end
-                if #self.players >= self:GetMaxPlayers() then text = "Cannot join - match full" end
+                if #self.players >= self:GetMaxPlayers() and (!self:GetBotsPlaceholder()) then text = "Cannot join - match full" end
                 draw.SimpleText(text, "gpoker_bold", x, y + bH / 2 - pad, color_white, TEXT_ALIGN_CENTER, TEXT_ALIGN_BOTTOM)
             end
         end

@@ -93,8 +93,8 @@ net.Receive("gpoker_derma_bettingActions", function(l, p)
 
         sound.Play("mvm/mvm_money_pickup.wav", s:GetPos())
     elseif choice == 2 then
-        s.players[k].paidBet = s:GetBet()
         gPoker.betType[s:GetBetType()].add(p, -(s:GetBet() - s.players[k].paidBet), s)
+        s.players[k].paidBet = s:GetBet()
 
         sound.Play("mvm/mvm_money_pickup.wav", s:GetPos())
     elseif choice == 3 then

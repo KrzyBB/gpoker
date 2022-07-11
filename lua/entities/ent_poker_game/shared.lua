@@ -223,7 +223,7 @@ function ENT:getDeckValue(deck)
 
 
     //Full house, Three of a kind, Pair(s)
-    if strength == nil then
+    -- if strength == nil then
         if haveThreeKind != nil and #havePair > 0 then
             strength = 6
             value = haveThreeKind + havePair[1] * 0.01
@@ -237,33 +237,35 @@ function ENT:getDeckValue(deck)
             strength = 1
             value = havePair[1]
         end
-    end
+    -- end
 
-    if strength == nil then
+    -- if strength == nil then
         local suit, rank = nil
 
-        //Straight
-        local sequence = 0
+        if #deck >= 5 then
+            //Straight
+            local sequence = 0
 
-        for i = 0, 12 do
-            if ranks[i] == 1 then
-                sequence = sequence + 1
+            for i = 0, 12 do
+                if ranks[i] == 1 then
+                    sequence = sequence + 1
 
-                if sequence == #deck or sequence == 5 then
-                    haveStraight = i
+                    if sequence == #deck or sequence == 5 then
+                        haveStraight = i
+                        break
+                    end
+                elseif sequence > 0 then
                     break
                 end
-            elseif sequence > 0 then
-                break
             end
-        end
-        
-        //Flush
-        for k,v in pairs(suits) do
-            if v == #deck or v == 5 then 
-                haveFlush = true
-                suit = k
-            elseif v > 0 then break end
+
+            //Flush
+            for k,v in pairs(suits) do
+                if v == #deck or v == 5 then 
+                    haveFlush = true
+                    suit = k
+                elseif v > 0 then break end
+            end
         end
 
         //Highest ranks and suits
@@ -278,23 +280,23 @@ function ENT:getDeckValue(deck)
         end
 
         //Royal Flush, Straight Flush, Flush, Straight, High
-        if haveFlush and haveStraight == 13 then
+        if haveFlush and haveStraight == 13 and (strength == nil or strength != nil and strength < 9) then
             strength = 9
             value = suit
-        elseif haveFlush and haveStraight != nil then
+        elseif haveFlush and haveStraight != nil and (strength == nil or strength != nil and strength < 8) then
             strength = 8
             value = haveStraight
-        elseif haveStraight != nil then
+        elseif haveStraight != nil and (strength == nil or strength != nil and strength < 4) then
             strength = 4
             value = haveStraight
-        elseif haveFlush then
+        elseif haveFlush and (strength == nil or strength != nil and strength < 5) then
             strength = 5
             value = rank
-        else 
+        elseif strength == nil then
             strength = 0
             value = rank
         end
-    end
+    -- end
 
     return strength, value
 end

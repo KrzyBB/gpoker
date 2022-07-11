@@ -73,6 +73,12 @@ function ENT:updateBots(tab)
             end
         end
     end
+
+    timer.Simple(0.1, function()
+        if IsValid(self) then
+            self:updatePlayersTable()
+        end
+    end)
 end
 
 
@@ -98,6 +104,10 @@ function ENT:addBot(data)
     bot:SetModel(data.mdl)
     bot:SetModelColor(Vector(data.clr.r, data.clr.g, data.clr.b))
     bot:SetSequence("Sit")
+    bot:SetFlexWeight(0, 0)
+    seat:PhysicsInit(SOLID_NONE)
+    seat:SetMoveType(MOVETYPE_NONE)
+    seat:SetSolid(SOLID_NONE)
 
     self.players[index] = {
         ready = true,
@@ -583,7 +593,7 @@ function ENT:simulateBotAction(bot)
         local minCheckChance = math.random(80 * (st * 0.1 + vl * 0.01 + 0.1),100) --Min: 8, Max: 82,4
         local chance = math.random(0, 100)
 
-        if chance >= minCheckChance or gPoker.betType[self:GetBetType()].get(Entity(self.players[bot].ind)) > 0 then
+        if chance >= minCheckChance or gPoker.betType[self:GetBetType()].get(Entity(self.players[bot].ind)) < 1 then
             timer.Simple(proceedTime, function() 
                 if IsValid(self) then 
                     if self:GetGameState() < 1 then return end
@@ -624,10 +634,20 @@ function ENT:simulateBotAction(bot)
         local bet = self:GetBet()
         local botValue = gPoker.betType[self:GetBetType()].get(Entity(self.players[bot].ind))
 
-        local callChance = math.random(1,15) * (bet * (math.random(1,6) * 0.1)) * ((botValue/bet)/2) * st/3
-        local foldChance = math.random(1,15) * (bet / botValue) * (math.random(1,6)/2) * (math.random(2,5) * 0.1)
-        local raiseChance = math.random(1,15) * (bet * (math.random(1,20) * 0.1)) * (botValue/bet) * st/4 * (math.random(1, 15) * 0.01)
+        //Holy shit my brain turned into a swimming pool from this
+
+        local callChance = (( math.pow(2 * botValue, 1.5) ) * math.pow((st + 1), 2) * (100 / (10 * (bet + 1)))) / 100 * math.random(1,5)
+        local foldChance = ((0.5 * botValue) * math.pow(0.35 * (bet + 1), 2) * (100 / (14000 * (0.5 * (st + 1)))) ) / 100 * math.random(1,5)
+        local raiseChance = (( math.pow(2 * botValue, 1.5) ) * math.pow((st + 1), 2) * (100 / (25 * (bet + 1)))) / 100 * math.random(1,5)
+
+        -- local callChance = (math.random(1,15) * (bet * (math.random(1,6))) * ((botValue/bet)/2) * st/3)
+        -- local foldChance = (math.random(1,15) * (bet / botValue) * (math.random(1,6)/2))
+        -- local raiseChance = (math.random(1,15) * (bet * (math.random(1,20))) * (botValue/bet) * st/4 * (math.random(1, 15) * 0.01))
         local canRaise = botValue > bet
+
+        -- print("Call chance: ", callChance)
+        -- print("Fold chance: ", foldChance)
+        -- print("Raise chance: ", raiseChance, canRaise)
 
         timer.Simple(proceedTime, function()
             if !IsValid(self) then return end
