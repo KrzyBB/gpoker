@@ -351,7 +351,7 @@ gPoker.strength = {
 gPoker.bots = {}
 
 //Lots of references
-gPoker.bots.names = {"Æ", "The Shark", "Multiplier", "The Ripper", "Big Boss", "Christ", "The Dude", "White", "Freeman", "Alpha", "Jetstream", "Beta", "Approaching Storm", "Afton", "Gamma", "White Wolf", "Narrator", "Rookie", "Snake Eater", "Mars", "Tea Sniffer", "Dango", "Folder", "Scarlet Devil", "Beep Boop", "Karen Slayer", "The Beach", "Silent", "May", "August", "Player", "Sol", "Risker", "Miller", "Slayer of Doom", "Doom", "Finger"}
+gPoker.bots.names = {"Æ", "The Shark", "Multiplier", "The Ripper", "Big Boss", "Christ", "The Dude", "White", "Freeman", "Alpha", "Jetstream", "Beta", "Approaching Storm", "Afton", "Gamma", "White Wolf", "Narrator", "Rookie", "Snake Eater", "Mars", "Tea Sniffer", "Dango", "Folder", "Scarlet Devil", "Beep Boop", "Karen Slayer", "The Beach", "Silent", "May", "August", "Player", "Sol", "Risker", "Miller", "Slayer of Doom", "Doom", "Finger", /*v1.0.3*/ "Minge", "anonymous", "ByzrK", "Trickster", "Dummy", "Cthulhu", "Deadweight", "Quiet", "V1", "V2", "Deez", "Nuts", "Shalashaska", "Liquid", "Bandit", "Monkey", "Bloon", "Red", "La Li Lu Le Lo", "Impending Doom", "Engineer", "Gwent Expert", "GPoker sucks", "Bug", "Red Saber", "CUtIRBTree Overflow!", "Stack Overflow", "JC"}
 
 //Global Functions//
 
