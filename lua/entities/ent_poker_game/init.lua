@@ -637,17 +637,10 @@ function ENT:simulateBotAction(bot)
         //Holy shit my brain turned into a swimming pool from this
 
         local callChance = (( math.pow(2 * botValue, 1.5) ) * math.pow((st + 1), 2) * (100 / (10 * (bet + 1)))) / 100 * math.random(1,5)
-        local foldChance = ((0.5 * botValue) * math.pow(0.35 * (bet + 1), 2) * (100 / (14000 * (0.5 * (st + 1)))) ) / 100 * math.random(1,5)
+        local foldChance = ((0.5 * botValue) * math.pow(0.35 * (bet + 1), 2) * (100 / (14000 * (0.5 * (st + 1)))) ) / 100 * math.Clamp((self:GetGameState() * (math.random(10,20) * 0.1))/#gPoker.gameType[self:GetGameType()].states, 0.1, 1.2) * math.random(1,5)
         local raiseChance = (( math.pow(2 * botValue, 1.5) ) * math.pow((st + 1), 2) * (100 / (25 * (bet + 1)))) / 100 * math.random(1,5)
 
-        -- local callChance = (math.random(1,15) * (bet * (math.random(1,6))) * ((botValue/bet)/2) * st/3)
-        -- local foldChance = (math.random(1,15) * (bet / botValue) * (math.random(1,6)/2))
-        -- local raiseChance = (math.random(1,15) * (bet * (math.random(1,20))) * (botValue/bet) * st/4 * (math.random(1, 15) * 0.01))
         local canRaise = botValue > bet
-
-        -- print("Call chance: ", callChance)
-        -- print("Fold chance: ", foldChance)
-        -- print("Raise chance: ", raiseChance, canRaise)
 
         timer.Simple(proceedTime, function()
             if !IsValid(self) then return end
@@ -678,7 +671,13 @@ function ENT:simulateBotAction(bot)
 
             self.players[bot].ready = true
             self:updatePlayersTable()
-            self:proceed()
+
+            timer.Simple(0.2, function()
+                if !IsValid(self) then return end
+                if self:GetGameState() < 1 then return end
+
+                self:proceed()
+            end)
         end)
 
     end
@@ -1120,6 +1119,30 @@ function ENT:finishRound()
         winner = sameStrength[1].ply
         strength = sameStrength[1].strength
         value = sameStrength[1].value
+
+        if #sameStrength > 1 and sameStrength[1].value == sameStrength[2].value then
+            local final = {}
+            local highValue = sameStrength[1].value
+
+            for k,v in pairs(sameStrength) do
+                if v.value == highValue then 
+                    local points = 0
+                    for _, val in pairs(self.decks[v.ply]) do
+                        points = points + (val.rank + 1)     
+                    end
+
+                    ind = #final + 1
+                    final[ind] = v
+                    final[ind].pt = points
+                end
+            end
+
+            table.sort(final, function(a,b) return a.pt > b.pt end)
+
+            winner = final[1].ply
+            strength = final[1].strength
+            value = final[1].value
+        end
     end
 
     self:SetWinner(winner)
@@ -1246,7 +1269,7 @@ function ENT:prepareForRestart()
         end
     end
 
-    if self:getPlayersAmount() > 0 and (self:GetBots() > 0 and self:getBotsAmount() > 0) then self:SetGameState(0) else
+    if (self:getPlayersAmount() > 1) or (self:getPlayersAmount() > 0 and self:getBotsAmount() > 0) then self:SetGameState(0) else
         if self:getPlayersAmount() > 0 then
             for k,v in pairs(self.players) do
                 if !v.bot then self:removePlayerFromMatch(Entity(v.ind)) end

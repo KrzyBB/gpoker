@@ -174,6 +174,7 @@ function ENT:SetupDataTables()
                     net.Start("gpoker_derma_bettingActions", false)
                         net.WriteEntity(self)
                         net.WriteBool(self:GetCheck())
+                        net.WriteFloat(self:GetBet())
                     net.Send(ply)
                 end
             end
@@ -185,118 +186,94 @@ end
 
 //Returns strength (ex. straight) and value (ex. ace high)
 function ENT:getDeckValue(deck)
-    local havePair = {} //Highest card(s) of pair(s)
-    local haveThreeKind = nil //Highest card
-    local haveStraight = nil //Highest card
-    local haveFlush = false
+    local strength = 0
+    local value = 0
 
-    //The amount of suits and ranks as a table
-    local ranks = {} 
+    local ranks = {}
     local suits = {}
 
-    for i = 0, 12, 1 do
+    local high = nil
+    local pair = {}
+    local threeKind = nil
+    local fourKind = nil
+    local straight = nil
+    local flush = nil
+
+    for i = 0, 12 do
         ranks[i] = 0
         if i >= 0 and i <= 3 then suits[i] = 0 end
     end
-    
-    local strength = nil
-    local value = 0
 
-    //Filling the suits and ranks tables with cards from our deck
     for k,v in pairs(deck) do
         ranks[v.rank] = ranks[v.rank] + 1
         suits[v.suit] = suits[v.suit] + 1
     end
 
-    //Four of a kind, Three of a kind, Pair(s)
-    for i = 0, 12, 1 do
+    //Four, three kinds and pairs
+    for i = 12, 0, -1 do
         if ranks[i] == 4 then
-            strength = 7 //Four of a kind
-            value = i
-            break
+            fourKind = i
         elseif ranks[i] == 3 then
-            haveThreeKind = i
+            threeKind = i
         elseif ranks[i] == 2 then
-            havePair[#havePair + 1] = i
+            pair[#pair + 1] = i
+        end
+
+        if high == nil and ranks[i] > 0 then high = i end
+    end
+
+    //Straight and flush
+    if #deck >= 5 then
+        //Flush
+        for k,v in pairs(suits) do
+            if v >= 5 then flush = k break end
+        end
+
+        //Straight
+        local sequence = 0
+
+        for i = 0, 12 do
+            if ranks[i] > 0 then
+                sequence = sequence + 1
+                if sequence >= 5 then straight = i end
+            else sequence = 0 end
         end
     end
 
 
-    //Full house, Three of a kind, Pair(s)
-    -- if strength == nil then
-        if haveThreeKind != nil and #havePair > 0 then
-            strength = 6
-            value = haveThreeKind + havePair[1] * 0.01
-        elseif haveThreeKind != nil then
-            strength = 3
-            value = haveThreeKind
-        elseif #havePair == 2 then
-            strength = 2
-            value = havePair[1] * 0.01 + havePair[2] 
-        elseif #havePair == 1 then
-            strength = 1
-            value = havePair[1]
-        end
-    -- end
 
-    -- if strength == nil then
-        local suit, rank = nil
-
-        if #deck >= 5 then
-            //Straight
-            local sequence = 0
-
-            for i = 0, 12 do
-                if ranks[i] == 1 then
-                    sequence = sequence + 1
-
-                    if sequence == #deck or sequence == 5 then
-                        haveStraight = i
-                        break
-                    end
-                elseif sequence > 0 then
-                    break
-                end
-            end
-
-            //Flush
-            for k,v in pairs(suits) do
-                if v == #deck or v == 5 then 
-                    haveFlush = true
-                    suit = k
-                elseif v > 0 then break end
-            end
-        end
-
-        //Highest ranks and suits
-        for i=12, 0, -1 do
-            if ranks[i] > 0 then rank = i break end
-        end
-
-        if suit == nil then
-            for i=3,0,-1 do
-                if suits[i] > 0 then suit = i break end
-            end
-        end
-
-        //Royal Flush, Straight Flush, Flush, Straight, High
-        if haveFlush and haveStraight == 13 and (strength == nil or strength != nil and strength < 9) then
-            strength = 9
-            value = suit
-        elseif haveFlush and haveStraight != nil and (strength == nil or strength != nil and strength < 8) then
-            strength = 8
-            value = haveStraight
-        elseif haveStraight != nil and (strength == nil or strength != nil and strength < 4) then
-            strength = 4
-            value = haveStraight
-        elseif haveFlush and (strength == nil or strength != nil and strength < 5) then
-            strength = 5
-            value = rank
-        elseif strength == nil then
-            strength = 0
-            value = rank
-        end
-    -- end
+    //Getting strength and values
+    if flush != nil and straight != nil and straight == 12 then --Royal Flush
+        strength = 9
+        value = flush
+    elseif flush != nil and straight != nil then --Straight Flush
+        strength = 8
+        value = straight + flush * 0.1
+    elseif fourKind != nil then --Four of a Kind
+        strength = 7
+        value = fourKind
+    elseif threeKind != nil and #pair > 0 then --Full House
+        strength = 6
+        value = threeKind + pair[1] * 0.01
+    elseif flush != nil then --Flush
+        strength = 5
+        value = high
+    elseif straight != nil then --Straight
+        strength = 4
+        value = straight
+    elseif threeKind != nil then --Three of a kind
+        strength = 3
+        value = threeKind
+    elseif #pair >= 2 then
+        strength = 2
+        value = pair[1] + pair[2] * 0.01
+    elseif #pair == 1 then
+        strength = 1
+        value = pair[1]
+    else
+        strength = 0
+        value = high
+    end
 
     return strength, value
 end

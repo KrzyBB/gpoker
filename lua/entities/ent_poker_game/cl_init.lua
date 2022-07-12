@@ -380,7 +380,7 @@ end
 
 
 
-function ENT:openBettingDerma(check)
+function ENT:openBettingDerma(check, curbet)
     local w, h = 300, 150
 
     local win = vgui.Create("DFrame")
@@ -408,7 +408,7 @@ function ENT:openBettingDerma(check)
     win:SetPopupStayAtBack(true)
     win:MakePopup()
 
-
+    bet = bet or 0
 
 
     local buttonOutline = 2
@@ -441,7 +441,7 @@ function ENT:openBettingDerma(check)
 
         local bet = vgui.Create("DButton", win)
         local clr = color_white
-        local canBet = gPoker.betType[self:GetBetType()].get(LocalPlayer()) > self:GetBet()
+        local canBet = gPoker.betType[self:GetBetType()].get(LocalPlayer()) > curbet
 
         if !canBet then clr = Color(155,155,155) end
 
@@ -471,7 +471,7 @@ function ENT:openBettingDerma(check)
             betAmount:SetPos(10, 0)
             betAmount:CenterVertical()
             betAmount:SetSize(w-(h-20)/2, 25)
-            betAmount:SetMin(self:GetBet())
+            betAmount:SetMin(curbet)
             betAmount:SetMax(gPoker.betType[self:GetBetType()].get(LocalPlayer()))
             betAmount:SetValue(betAmount:GetMin())
 
@@ -560,9 +560,9 @@ function ENT:openBettingDerma(check)
         local callVal = vgui.Create("DLabel", call)
         callVal:SetFont("gpoker_bold")
         callVal:SetTextColor(color_white)
-        callVal:SetText("(" .. self:GetBet() - self.players[self:getPlayerKey(LocalPlayer())].paidBet .. gPoker.betType[self:GetBetType()].fix .. ")")
+        callVal:SetText("(" .. curbet - self.players[self:getPlayerKey(LocalPlayer())].paidBet .. gPoker.betType[self:GetBetType()].fix .. ")")
         surface.SetFont("gpoker_bold")
-        local textW, _ = surface.GetTextSize("(" .. self:GetBet() - self.players[self:getPlayerKey(LocalPlayer())].paidBet .. gPoker.betType[self:GetBetType()].fix .. ")")
+        local textW, _ = surface.GetTextSize("(" .. curbet - self.players[self:getPlayerKey(LocalPlayer())].paidBet .. gPoker.betType[self:GetBetType()].fix .. ")")
         
         callVal:SetPos(call:GetWide()/2 - textW/2, call:GetTall()/2 + 10)
 
@@ -592,11 +592,8 @@ function ENT:openBettingDerma(check)
             win:Remove()
         end
 
-
-        local curBet = self:GetBet()
-
         local raise = vgui.Create("DButton", win)
-        local canRaise = gPoker.betType[self:GetBetType()].get(LocalPlayer()) > curBet + 1
+        local canRaise = gPoker.betType[self:GetBetType()].get(LocalPlayer()) > curbet + 1
         local clr = color_white
 
         if !canRaise then clr = Color(155,155,155) end
@@ -627,9 +624,9 @@ function ENT:openBettingDerma(check)
             raiseAmount:SetPos(10, 0)
             raiseAmount:CenterVertical()
             raiseAmount:SetSize(w-(h-20)/2, 25)
-            raiseAmount:SetMin(self:GetBet() + 1)
+            raiseAmount:SetMin(curbet + 1)
             raiseAmount:SetMax(gPoker.betType[self:GetBetType()].get(LocalPlayer()))
-            raiseAmount:SetValue(self:GetBet() + 1)
+            raiseAmount:SetValue(curbet + 1)
 
             local raiseButton = vgui.Create("DButton", win)
             raiseButton:SetSize((h-20)/2,(h-20)/2)
@@ -870,7 +867,7 @@ function ENT:openLeaveRequest()
             if gPoker.gameType[self:GetGameType()].states[self:GetGameState()].drawing then
                 self:openExchangeDerma()
             else
-                self:openBettingDerma(self:GetCheck())
+                self:openBettingDerma(self:GetCheck(), self:GetBet())
             end
         end
         win:Close()

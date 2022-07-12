@@ -449,7 +449,10 @@ net.Receive("gpoker_derma_bettingActions", function()
     local ent = net.ReadEntity()
 
     if !IsValid(ent) then return end
-    ent:openBettingDerma(net.ReadBool())
+    local check = net.ReadBool()
+    local bet = net.ReadFloat()
+
+    ent:openBettingDerma(check, bet)
 end)
 
 
