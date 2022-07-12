@@ -223,21 +223,43 @@ net.Receive("gpoker_derma_createGame", function()
     local bots = {}
 
     botAdd.DoClick = function()
-        if #botsList:GetLines() >= math.Clamp(maxPly:GetValue(), maxPly:GetMin(), maxPly:GetMax()) then return end
+        //We have to use this method due to #GetLines() returning the highest id instead of the amount
+        local count = 0
+        for k,v in pairs(botsList:GetLines()) do count = count + 1 end
+            
+        if count >= math.Clamp(maxPly:GetValue(), maxPly:GetMin(), maxPly:GetMax()) then return end
 
-        local index = #bots + 1
+        local max = 16 --Max amount of times we want our loop to try and find an unique name 
+        local x = 0
+        local unique = true
+        local name
 
-        bots[index] = {
-            name = table.Random(gPoker.bots.names),
-            mdl = table.Random(player_manager.AllValidModels()),
-            clr = Color(math.random(0,255), math.random(0,255), math.random(0,255))
-        }
+        repeat
+            name = table.Random(gPoker.bots.names)
+            x = x + 1
 
-        local idk = botsList:AddLine(bots[index].name, bots[index].mdl, bots[index].clr)
-        idk.OnSelect = function()
+            if #bots > 0 then
+                for k,v in pairs(bots) do
+                    if v.name == name then unique = false break end
+                end
+            end
+        until x >= max or unique
+
+        local mdl = table.Random(player_manager.AllValidModels())
+        local clr = Vector(math.random(0,255)/255, math.random(0,255)/255, math.random(0,255)/255)
+
+        local line = botsList:AddLine(name, mdl, Color(clr.r * 255, clr.g * 255, clr.b * 255))
+        line.OnSelect = function()
             botRemove:SetEnabled(true)
             botEdit:SetEnabled(true)
         end
+
+        bots[#bots + 1] = {
+            name = name,
+            mdl = mdl,
+            clr = clr,
+            panel = line
+        }
     end
 
     maxPly.OnValueChanged = function()
@@ -254,18 +276,26 @@ net.Receive("gpoker_derma_createGame", function()
     botRemove.DoClick = function()
         local selected = botsList:GetSelected()
 
-        for k,v in pairs(selected) do
+        for k,v in pairs(selected) do            
+            for key, val in pairs(bots) do
+                if val.panel == v then table.remove(bots, key) break end
+            end
             botsList:RemoveLine(v:GetID())
-            table.remove(bots, v:GetID())
         end
 
-        
         botRemove:SetEnabled(false)
         botEdit:SetEnabled(false)
     end
 
     botEdit.DoClick = function()
         local selected, selectedPanel = botsList:GetSelectedLine()
+        local key = nil
+
+        for k,v in pairs(bots) do
+            if v.panel == selectedPanel then key = k break end
+        end
+
+        if key == nil then return end
 
         local editWin = vgui.Create("DFrame")
         editWin:SetSize(winW * 1.3, winH * 1.75)
@@ -286,7 +316,7 @@ net.Receive("gpoker_derma_createGame", function()
         local editName = vgui.Create("DTextEntry", left)
         editName:Dock(TOP)
         editName:DockMargin(10,0,10,0)
-        editName:SetText(bots[selected].name)
+        editName:SetText(bots[key].name)
 
         local clrLabel = vgui.Create("DLabel", left)
         clrLabel:Dock(TOP)
@@ -297,7 +327,7 @@ net.Receive("gpoker_derma_createGame", function()
         local editClr = vgui.Create("DColorMixer", left)
         editClr:Dock(TOP)
         editClr:DockMargin(10,0,10,0)
-        editClr:SetColor(bots[selected].clr)
+        editClr:SetColor(Color(bots[key].clr.r * 255, bots[key].clr.g * 255, bots[key].clr.b * 255))
 
         local finish = vgui.Create("DButton", left)
         finish:Dock(BOTTOM)
@@ -310,7 +340,7 @@ net.Receive("gpoker_derma_createGame", function()
         right:Dock(RIGHT)
         right:SetWide(editWin:GetWide() - left:GetWide() - 15)
 
-        local goddamnmodel = bots[selected].mdl
+        local goddamnmodel = bots[key].mdl
 
         local preview = vgui.Create("DModelPanel", right)
         preview:Dock(TOP)
@@ -350,13 +380,13 @@ net.Receive("gpoker_derma_createGame", function()
         end
 
         finish.DoClick = function()
-            bots[selected].name = editName:GetValue()
-            bots[selected].mdl = goddamnmodel
-            bots[selected].clr = editClr:GetColor()
+            bots[name].name = editName:GetValue()
+            bots[name].mdl = goddamnmodel
+            bots[name].clr = Vector(editClr:GetColor().r / 255, editClr:GetColor().g / 255, editClr:GetColor().b / 255)
 
-            selectedPanel:SetColumnText(1, bots[selected].name)
-            selectedPanel:SetColumnText(2, bots[selected].mdl)
-            selectedPanel:SetColumnText(3, Color(bots[selected].clr.r, bots[selected].clr.g, bots[selected].clr.b))
+            selectedPanel:SetColumnText(1, bots[name].name)
+            selectedPanel:SetColumnText(2, bots[name].mdl)
+            selectedPanel:SetColumnText(3, Color(editClr:GetColor().r, editClr:GetColor().g, editClr:GetColor().b))
 
             editWin:Remove()
         end
