@@ -417,6 +417,10 @@ net.Receive("gpoker_derma_createGame", function()
 
 
     createButton.DoClick = function()
+        for k,v in pairs(bots) do
+            v.panel = nil
+        end
+
         local options = {
             game = {
                 type    = gameSelect:GetOptionData(gameSelect:GetSelectedID()) or 0,
