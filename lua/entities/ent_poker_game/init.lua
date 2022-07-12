@@ -1246,7 +1246,9 @@ function ENT:prepareForRestart()
         end
     end
 
-    if self:getPlayersAmount() > 0 and (self:GetBots() > 0 and self:getBotsAmount() > 0) then self:SetGameState(0) else
+    if self:getPlayersAmount() > 1 or (self:getPlayersAmount() == 1 and self:GetBots() > 0 and self:getBotsAmount() > 0) then
+		self:SetGameState(0)
+	else
         if self:getPlayersAmount() > 0 then
             for k,v in pairs(self.players) do
                 if !v.bot then self:removePlayerFromMatch(Entity(v.ind)) end
