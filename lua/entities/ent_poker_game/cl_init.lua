@@ -795,8 +795,8 @@ end
 function ENT:openLeaveRequest()
     self.leaveRequested = self.leaveRequested or false
 
-	if self.leaveRequested then return
-	else self.leaveRequested = true end
+    if self.leaveRequested then return
+    else self.leaveRequested = true end
 
     local w, h = 200, 120
     local win = vgui.Create("DFrame")
@@ -828,8 +828,6 @@ function ENT:openLeaveRequest()
     y:SetSize(100,100)
     y:SetPos(0,20)
     y.Paint = function(self, w, h)
-		self.leaveRequested = false
-
         if self:IsHovered() then
             surface.SetDrawColor(Color(71,133,198))
         else
@@ -842,6 +840,7 @@ function ENT:openLeaveRequest()
         surface.DrawOutlinedRect(0,0,w,h,buttonOutline)
     end
     y.DoClick = function()
+        self.leaveRequested = false
         win:Close()
 
         if !IsValid(self) then return end
@@ -870,7 +869,7 @@ function ENT:openLeaveRequest()
         surface.DrawOutlinedRect(0,0,w,h,buttonOutline)
     end
     n.DoClick = function()
-		self.leaveRequested = false
+        self.leaveRequested = false
 
         if self:GetTurn() == self:getPlayerKey(LocalPlayer()) then 
             if gPoker.gameType[self:GetGameType()].states[self:GetGameState()].drawing then
