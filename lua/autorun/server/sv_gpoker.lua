@@ -189,7 +189,7 @@ hook.Add("PlayerDisconnected", "gpoker_playerDisconnected", function(ply)
 end)
 
 hook.Add("CanExitVehicle", "gpoker_disableSeatExitting", function(veh, ply)
-    if veh:GetVehicleClass() == "Chair_Office2" and IsValid(veh:GetParent()) and veh:GetParent():GetClass() == "ent_poker_game" then return false else return true end
+    if veh:GetVehicleClass() == "Chair_Office2" and IsValid(veh:GetParent()) and veh:GetParent():GetClass() == "ent_poker_game" then return false end
 end)
 
 hook.Add("EntityTakeDamage", "gpoker_nullifyPlayerDamage", function(attacked, dmgInfo)
@@ -212,5 +212,4 @@ hook.Add("CanPlayerEnterVehicle", "gpoker_disallowSittingOnBotSeats", function(p
             if v:GetClass() == "ent_poker_bot" then return false end
         end
     end
-    return true
 end)
