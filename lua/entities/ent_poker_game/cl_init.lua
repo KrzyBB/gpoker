@@ -840,7 +840,7 @@ function ENT:openLeaveRequest()
         surface.DrawOutlinedRect(0,0,w,h,buttonOutline)
     end
     y.DoClick = function()
-	self.leaveRequested = false
+        self.leaveRequested = false
         win:Close()
 
         if !IsValid(self) then return end
@@ -869,7 +869,7 @@ function ENT:openLeaveRequest()
         surface.DrawOutlinedRect(0,0,w,h,buttonOutline)
     end
     n.DoClick = function()
-	self.leaveRequested = false
+        self.leaveRequested = false
 
         if self:GetTurn() == self:getPlayerKey(LocalPlayer()) then 
             if gPoker.gameType[self:GetGameType()].states[self:GetGameState()].drawing then
