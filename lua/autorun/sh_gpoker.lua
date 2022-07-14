@@ -297,6 +297,61 @@ gPoker.betType = {
     }
 }
 
+//Bet types for addons
+
+--Pointshop
+if PS != nil then
+    gPoker.betType[#gPoker.betType + 1] = {
+        name = "Points",
+        fix = "PT",
+        canSet = false,
+        setMinMax = {min = 0, max = 0},
+        feeMinMax = {min = 0, max = function() if CLIENT then return LocalPlayer():PS_GetPoints() end end},
+        get = function(p)
+            if p:IsPlayer() then
+                return p:PS_GetPoints()
+            else
+                local ent = gPoker.getTableFromPlayer(p)
+
+                if !IsValid(ent) then return 0 end
+
+                local key = ent:getPlayerKey(p)
+                return ent.players[key].points
+            end
+        end,
+        add = function(p, a, e)
+            if CLIENT then return end
+            if !IsValid(p) then return end
+
+            a = a or 0
+
+            if p:IsPlayer() then
+                p:PS_GivePoints(a)
+            else
+                local points = gPoker.betType[e:GetBetType()].get(p) + a
+                e.players[e:getPlayerKey(p)].points = points
+                e:updatePlayersTable()
+            end
+
+            e:SetPot(e:GetPot() - a)
+        end,
+        call = function(s, p)
+            if !p:IsPlayer() then s.players[s:getPlayerKey(p)].points = math.random(40, 220) end
+        end,
+        models = {
+            [1] = {
+                mdl = Model("models/props_c17/SuitCase_Passenger_Physics.mdl"),
+                val = 200,
+                scale = 0.75
+            },
+            [2] = {
+                mdl = Model("models/props_c17/SuitCase001a.mdl"),
+                val = 999999,
+                scale = 0.75
+            }
+        }
+    }
+end
 
 
 //Cards materials, for hud
