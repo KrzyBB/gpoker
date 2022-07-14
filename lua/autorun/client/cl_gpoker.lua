@@ -380,12 +380,12 @@ net.Receive("gpoker_derma_createGame", function()
         end
 
         finish.DoClick = function()
-            bots[name].name = editName:GetValue()
-            bots[name].mdl = goddamnmodel
-            bots[name].clr = Vector(editClr:GetColor().r / 255, editClr:GetColor().g / 255, editClr:GetColor().b / 255)
+            bots[key].name = editName:GetValue()
+            bots[key].mdl = goddamnmodel
+            bots[key].clr = Vector(editClr:GetColor().r / 255, editClr:GetColor().g / 255, editClr:GetColor().b / 255)
 
-            selectedPanel:SetColumnText(1, bots[name].name)
-            selectedPanel:SetColumnText(2, bots[name].mdl)
+            selectedPanel:SetColumnText(1, bots[key].name)
+            selectedPanel:SetColumnText(2, bots[key].mdl)
             selectedPanel:SetColumnText(3, Color(editClr:GetColor().r, editClr:GetColor().g, editClr:GetColor().b))
 
             editWin:Remove()
