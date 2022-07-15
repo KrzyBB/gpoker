@@ -6,12 +6,7 @@ AddCSLuaFile("cl_init.lua")
 
 //Poker info
 ENT.deck = {}
-ENT.decks = {
-    [1] = {},
-    [2] = {},
-    [3] = {},
-    [4] = {}
-}
+ENT.decks = {}
 
 
 //Functions//
