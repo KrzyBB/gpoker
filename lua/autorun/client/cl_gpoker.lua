@@ -180,6 +180,7 @@ net.Receive("gpoker_derma_createGame", function()
 
         entryFee:SetMinMax(gPoker.betType[betSelect:GetOptionData(betSelect:GetSelectedID())].feeMinMax.min, gPoker.betType[betSelect:GetOptionData(betSelect:GetSelectedID())].feeMinMax.max(startValue))
         if entryFee:GetValue() > entryFee:GetMax() then entryFee:SetValue(entryFee:GetMax()) end
+        entryFee:SetValue(entryFee:GetMax() / 10)
     end
 
     //Bots

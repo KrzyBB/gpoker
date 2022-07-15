@@ -52,8 +52,13 @@ net.Receive("gpoker_payEntry", function(_, ply)
 
     if paid then
         gPoker.betType[ent:GetBetType()].add(ply, -ent:GetEntryBet(), ent)
-        ent.players[ent:getPlayerKey(ply)].ready = true
-        sound.Play("mvm/mvm_money_pickup.wav", ent:GetPos())
+
+        local key = ent:getPlayerKey(ply)
+
+        if key != nil then
+            ent.players[ent:getPlayerKey(ply)].ready = true
+            sound.Play("mvm/mvm_money_pickup.wav", ent:GetPos())
+        end
     else
         ent:removePlayerFromMatch(ply)
     end
